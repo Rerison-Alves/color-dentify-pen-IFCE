@@ -1,3 +1,4 @@
+#include "sensor.h"
 #include <Arduino.h>
 
 #define S0 25
@@ -35,64 +36,7 @@ void setup() {
 }
 
 void loop() {
-    // Setting RED (R) filtered photodiodes to be read
-    digitalWrite(S2,LOW);
-    digitalWrite(S3,LOW);
-
-    // Reading the output frequency
-    redFrequency = pulseIn(OUT, LOW);
-    // Remaping the value of the RED (R) frequency from 0 to 255
-    // You must replace with your own values. Here's an example:
-    // redColor = map(redFrequency, 70, 120, 255,0);
-    redColor = map(redFrequency, 70, 120, 255,0);
-
-    // Printing the RED (R) value
-    Serial.print("R = ");
-    Serial.print(redColor);
-    delay(10);
-
-    // Setting GREEN (G) filtered photodiodes to be read
-    digitalWrite(S2,HIGH);
-    digitalWrite(S3,HIGH);
-
-    // Reading the output frequency
-    greenFrequency = pulseIn(OUT, LOW);
-    // Remaping the value of the GREEN (G) frequency from 0 to 255
-    // You must replace with your own values. Here's an example:
-    // greenColor = map(greenFrequency, 100, 199, 255, 0);
-    greenColor = map(greenFrequency, 50, 150, 255, 0);
-
-    // Printing the GREEN (G) value
-    Serial.print(" G = ");
-    Serial.print(greenColor);
-    delay(10);
-
-    // Setting BLUE (B) filtered photodiodes to be read
-    digitalWrite(S2,LOW);
-    digitalWrite(S3,HIGH);
-
-    // Reading the output frequency
-    blueFrequency = pulseIn(OUT, LOW);
-    // Remaping the value of the BLUE (B) frequency from 0 to 255
-    // You must replace with your own values. Here's an example:
-    // blueColor = map(blueFrequency, 38, 84, 255, 0);
-    blueColor = map(blueFrequency, 50, 105, 255, 0);
-
-    // Printing the BLUE (B) value
-    Serial.print(" B = ");
-    Serial.print(blueColor);
-    delay(10);
-
-    // Checks the current detected color and prints
-    // a message in the serial monitor
-    if(redColor > greenColor && redColor > blueColor){
-        Serial.println(" - RED detected!");
-    }
-    if(greenColor > redColor && greenColor > blueColor){
-        Serial.println(" - GREEN detected!");
-    }
-    if(blueColor > redColor && blueColor > greenColor){
-        Serial.println(" - BLUE detected!");
-    }
+    Sensor sensor(S0, S1, S2, S3, OUT);
+    sensor.reading();
     delay(500);
 }
