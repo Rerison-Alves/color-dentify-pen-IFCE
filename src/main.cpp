@@ -7,16 +7,6 @@
 #define S3 14
 #define OUT 13
 
-// Stores frequency read by the photodiodes
-int redFrequency = 0;
-int greenFrequency = 0;
-int blueFrequency = 0;
-
-// Stores the red. green and blue colors
-int redColor = 0;
-int greenColor = 0;
-int blueColor = 0;
-
 void setup() {
     // Setting the outputs
     pinMode(S0, OUTPUT);
