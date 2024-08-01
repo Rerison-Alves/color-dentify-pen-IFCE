@@ -1,4 +1,6 @@
 #include "sensor.h"
+#include "speaker.h"
+#include "audios/sound_test.h"
 #include <Arduino.h>
 
 #define S0 25
@@ -6,6 +8,7 @@
 #define S2 27
 #define S3 14
 #define OUT 13
+#define DAC_PIN 25
 
 void setup() {
     // Setting the outputs
@@ -22,11 +25,18 @@ void setup() {
     digitalWrite(S1,LOW);
 
     // Begins serial communication
-    Serial.begin(9600);
+
+    //criação do controle de audio
+    
+    
+    Serial.begin(115200);
 }
 
 void loop() {
     Sensor sensor(S0, S1, S2, S3, OUT);
     sensor.reading();
+    Speaker speaker(DAC_PIN);
+    speaker.play_audio(roger);
+    
     delay(500);
 }

@@ -23,7 +23,10 @@
 #include "esp32-hal-timer.h"
 #include "XT_DAC_Audio.h"
 #include "HardwareSerial.h"
-#include "soc/sens_reg.h"  // For dacWrite() patch, TEB Sep-16-2019
+#include "soc/sens_reg.h"
+#include "soc/rtc_io_reg.h"
+#include "driver/rtc_io.h"
+  // For dacWrite() patch, TEB Sep-16-2019
 
 
 
