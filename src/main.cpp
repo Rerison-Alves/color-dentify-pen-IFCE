@@ -1,7 +1,11 @@
 #include "sensor.h"
 #include "speaker.h"
-#include "audios/sound_test.h"
-#include "audios/SoundData.h"
+#include <SPIFFS.h>
+#include <AudioFileSourceSPIFFS.h>
+#include <AudioGeneratorWAV.h>
+#include <AudioOutputI2SNoDAC.h>
+
+
 #include <Arduino.h>
 #include <XT_DAC_Audio.h>
 
@@ -11,8 +15,14 @@
 #define S3 14
 #define OUT 13
 #define DAC_PIN 25
-XT_Wav_Class Sound(sample); 
-XT_DAC_Audio_Class DacAudio(26,0);
+
+#define I2S_SPEAKER_SERIAL_CLOCK GPIO_NUM_4 // BCLK
+#define I2S_SPEAKER_LEFT_RIGHT_CLOCK GPIO_NUM_5 // WSEL
+#define I2S_SPEAKER_SERIAL_DATA GPIO_NUM_26
+
+AudioGeneratorWAV *wav;
+AudioFileSourceSPIFFS *file;
+AudioOutputI2SNoDAC *out;
 
 void setup() {
     // Setting the outputs
@@ -33,19 +43,30 @@ void setup() {
 
     //criação do controle de audio
     
-   
+    if (!SPIFFS.begin(true)) {
+    Serial.println("Erreur lors de l'initialisation de SPIFFS");
+    return;
+    }
+
+    file = new AudioFileSourceSPIFFS("/portugues/amarelo.wav");
+    out = new AudioOutputI2SNoDAC();
+    out->SetPinout(I2S_SPEAKER_SERIAL_CLOCK, I2S_SPEAKER_LEFT_RIGHT_CLOCK, I2S_SPEAKER_SERIAL_DATA);
+    wav = new AudioGeneratorWAV();
+    wav->begin(file, out);
     
     
     Serial.begin(115200);
 }
 
 void loop() {
-    Sensor sensor(S0, S1, S2, S3, OUT);
-    sensor.reading();
-    DacAudio.FillBuffer();
-    if(Sound.Playing==false) 
-     DacAudio.Play(&Sound);
-    
-    
-    delay(500);
+    if (wav->isRunning()) {
+        if (wav->loop()) {
+        // Le fichier WAV est toujours en lecture
+        } else {
+            Serial.println("Lecture du fichier WAV terminée.");
+            wav->stop();
+            file->close();
+        }
+  }
+   
 }
