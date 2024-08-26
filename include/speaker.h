@@ -1,16 +1,25 @@
 #ifndef SPEAKER_H
 #define SPEAKER_H
 
+#include <FS.h>
+#include <SPIFFS.h>
+#include "colors.h"
+#include "language.h"
 
-class Speaker{
+class Speaker {
 public:
-    Speaker(int pin_S25);
-    void play_audio(const unsigned char* sample);
-
-    
+    Speaker(uint8_t dacPin, float timbreFactor = 1.0, float volumeFactor = 1.0);
+    void begin();
+    void setLanguage(Language language);
+    void playColorSound(Color color);
 
 private:
-    int S25;
+    uint8_t _dacPin;
+    float _timbreFactor;
+    float _volumeFactor;
+    Language _language;
+    const char* getFilePath(Color color);
+    void playAudio(const char* filePath);
 };
 
-#endif
+#endif // SPEAKER_H

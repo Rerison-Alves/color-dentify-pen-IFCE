@@ -20,7 +20,7 @@ Sensor::Sensor(int pin_S0, int pin_S1, int pin_S2, int pin_S3, int pin_OUT) {
     blueFrequency = 0;
 }
 
-void Sensor::reading() {
+Color Sensor::reading() {
     // Setting RED (R) filtered photodiodes to be read
     digitalWrite(S2, LOW);
     digitalWrite(S3, LOW);
@@ -67,12 +67,15 @@ void Sensor::reading() {
     // a message in the serial monitor
     if (redColor > greenColor && redColor > blueColor) {
         Serial.println(" - RED detected!");
+        return Color::RED;
     }
     if (greenColor > redColor && greenColor > blueColor) {
         Serial.println(" - GREEN detected!");
+        return Color::GREEN;
     }
     if (blueColor > redColor && blueColor > greenColor) {
         Serial.println(" - BLUE detected!");
+        return Color::BLUE;
     }
-    delay(500);
+    return Color::INVALID;
 }
