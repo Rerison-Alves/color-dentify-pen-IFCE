@@ -20,7 +20,7 @@ Sensor::Sensor(int pin_S0, int pin_S1, int pin_S2, int pin_S3, int pin_OUT) {
     blueFrequency = 0;
 }
 
-void Sensor::reading() {
+Color Sensor::reading() {
     // Setting RED (R) filtered photodiodes to be read
     digitalWrite(S2, LOW);
     digitalWrite(S3, LOW);
@@ -28,7 +28,7 @@ void Sensor::reading() {
     // Reading the output frequency
     redFrequency = pulseIn(OUT, LOW);
     // Remaping the value of the RED (R) frequency from 0 to 255
-    redColor = map(redFrequency, 70, 120, 255, 0);
+    redColor = map(redFrequency, 50, 100, 255, 0);
 
     // Printing the RED (R) value
     Serial.print("R = ");
@@ -42,7 +42,7 @@ void Sensor::reading() {
     // Reading the output frequency
     greenFrequency = pulseIn(OUT, LOW);
     // Remaping the value of the GREEN (G) frequency from 0 to 255
-    greenColor = map(greenFrequency, 50, 150, 255, 0);
+    greenColor = map(greenFrequency, 50, 170, 255, 0);
 
     // Printing the GREEN (G) value
     Serial.print(" G = ");
@@ -66,13 +66,41 @@ void Sensor::reading() {
     // Checks the current detected color and prints
     // a message in the serial monitor
     if (redColor > greenColor && redColor > blueColor) {
-        Serial.println(" - RED detected!");
+        if (greenColor > blueColor) {
+            if (redColor - greenColor < 20) {
+                Serial.println(" - LARANJA detectado!");
+                return Color::ORANGE;
+            }
+            Serial.println(" - VERMELHO detectado!");
+            return Color::RED;
+        } else {
+            Serial.println(" - ROSA detectado!");
+            return Color::PINK;
+        }
     }
     if (greenColor > redColor && greenColor > blueColor) {
-        Serial.println(" - GREEN detected!");
+        if (blueColor > redColor) {
+            if (greenColor - blueColor < 20) {
+                Serial.println(" - VERDE detectado!");
+                return Color::GREEN;
+            }
+            Serial.println(" - AMARELO detectado!");
+            return Color::YELLOW;
+        } else {
+            Serial.println(" - VERDE detectado!");
+            return Color::GREEN;
+        }
     }
     if (blueColor > redColor && blueColor > greenColor) {
-        Serial.println(" - BLUE detected!");
+        if (redColor > greenColor) {
+            Serial.println(" - ROXO detectado!");
+            return Color::PURPLE;
+        } else {
+            Serial.println(" - AZUL detectado!");
+            return Color::BLUE;
+        }
     }
-    delay(500);
+
+    Serial.println("Nenhuma cor foi detectada!");
+    return Color::INVALID;
 }

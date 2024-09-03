@@ -1,10 +1,12 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
+#include "colors.h"
+
 class Sensor{
 public:
     Sensor(int pin_S0, int pin_S1, int pin_S2, int pin_S3, int pin_OUT);
-    void reading();
+    Color reading();
 
 private:
     int redColor, greenColor, blueColor;
