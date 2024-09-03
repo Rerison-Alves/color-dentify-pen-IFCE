@@ -2,11 +2,11 @@
 #include "speaker.h"
 #include "sensor.h"
 
-#define S0 25
-#define S1 26
-#define S2 27
-#define S3 14
-#define OUT 13
+#define S0 4
+#define S1 5
+#define S2 18
+#define S3 19
+#define OUT 21
 #define DAC_PIN 25
 
 Sensor sensor(S0, S1, S2, S3, OUT);
