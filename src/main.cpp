@@ -7,7 +7,7 @@
 #define S1 5
 #define S2 18
 #define S3 19
-#define OUT 21
+#define OUT 23
 #define DAC_PIN 25
 
 Sensor sensor(S0, S1, S2, S3, OUT);
@@ -21,6 +21,12 @@ Language lang(Language::PORTUGUESE);
 #define SCK_PIN 22
 
 OledDisplay oled(SCREEN_WIDTH, SCREEN_HEIGHT, SDA_PIN, SCK_PIN);
+
+
+void playColorSoundTask(Color detectedColor) {
+    speaker.playColorSound(detectedColor);// Reproduz o som da cor detectada
+    vTaskDelete(NULL);  // Deleta a task após execução
+}
 
 void setup() {
   // Begins serial communication
