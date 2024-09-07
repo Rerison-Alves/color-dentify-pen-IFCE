@@ -2,6 +2,7 @@
 #include "speaker.h"
 #include "sensor.h"
 #include "oled.h"
+#include "bot.h"
 
 #define S0 4
 #define S1 5
@@ -21,6 +22,14 @@ Language lang(Language::PORTUGUESE);
 #define SCK_PIN 22
 
 OledDisplay oled(SCREEN_WIDTH, SCREEN_HEIGHT, SDA_PIN, SCK_PIN);
+
+//Definindo o bot
+const char* WIFI_SSID = "S20";
+const char* WIFI_PASSWORD = "kust8362";
+const unsigned long BOT_MTBS = 1000;
+#define BOTtoken "7528571819:AAHvQSn3wAFr7nv_YvQMbes745q_RdBX_1o"
+
+Bot bot(WIFI_SSID,WIFI_PASSWORD,BOTtoken,BOT_MTBS);
 
 
 void playColorSoundTask(Color detectedColor) {
@@ -43,15 +52,18 @@ void setup() {
     digitalWrite(S1,LOW);
 
 
-    speaker.begin();
-    speaker.setLanguage(lang);
+    //speaker.begin();
+    //speaker.setLanguage(lang);
 
-    oled.begin();
+    //oled.begin();
+
+    bot.setup();
 }
 
 void loop() {
-    Color colorread = sensor.reading();
-    oled.displayText(colorToString(colorread,lang));
-    speaker.playColorSound(colorread);
+    //Color colorread = sensor.reading();
+    //oled.displayText(colorToString(colorread,lang));
+    //speaker.playColorSound(colorread);
+    bot.waitMessage(nullptr);
     delay(500);
 }
