@@ -56,7 +56,7 @@ Color Sensor::reading() {
     // Reading the output frequency
     blueFrequency = pulseIn(OUT, LOW);
     // Remaping the value of the BLUE (B) frequency from 0 to 255
-    blueColor = map(blueFrequency, 50, 110, 255, 0);
+    blueColor = map(blueFrequency, 45, 95, 255, 0);
 
     // Printing the BLUE (B) value
     Serial.print(" B = ");
@@ -66,7 +66,7 @@ Color Sensor::reading() {
     // Checks the current detected color and prints
     // a message in the serial monitor
 
-    if (redColor < -80 && greenColor < -80 && blueColor < -80) {
+    if (redColor < 80 && greenColor < 80 && blueColor < 80) {
         Serial.println(" - PRETO detectado!");
         return Color::BLACK;
     }
@@ -86,7 +86,10 @@ Color Sensor::reading() {
         if (abs(greenColor - redColor) < DIFF_THRESHOLD) {
             Serial.println(" - YELLOW detected!");
             return Color::YELLOW;
-        } else if (abs(blueColor - redColor) < DIFF_THRESHOLD) {
+        } else if (abs(greenColor - redColor) < DIFF_THRESHOLD*2) {
+            Serial.println(" - ORANGE detected!");
+            return Color::ORANGE;
+        }else if (abs(blueColor - redColor) < DIFF_THRESHOLD*2) {
             Serial.println(" - PINK detected!");
             return Color::PINK;
         } else {
@@ -95,10 +98,13 @@ Color Sensor::reading() {
         }
     } else if (blueColor > redColor && blueColor > greenColor) {
         // Blue is the predominant color
-        if (abs(blueColor - redColor) < DIFF_THRESHOLD) {
+        if (abs(blueColor - greenColor) < DIFF_THRESHOLD) {
+            Serial.println(" - CYAN detected!");
+            return Color::CYAN;
+        } else if (abs(blueColor - redColor) < DIFF_THRESHOLD*2.5) {
             Serial.println(" - PURPLE detected!");
             return Color::PURPLE;
-        } else {
+        }else {
             Serial.println(" - BLUE detected!");
             return Color::BLUE;
         }
@@ -107,7 +113,10 @@ Color Sensor::reading() {
         if (abs(redColor - greenColor) < DIFF_THRESHOLD) {
             Serial.println(" - YELLOW detected!");
             return Color::YELLOW;
-        } else {
+        } else if (abs(blueColor - greenColor) < DIFF_THRESHOLD*0.6) {
+            Serial.println(" - CYAN detected!");
+            return Color::CYAN;
+        }else {
             Serial.println(" - GREEN detected!");
             return Color::GREEN;
         }

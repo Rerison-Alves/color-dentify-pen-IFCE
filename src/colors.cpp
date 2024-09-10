@@ -9,6 +9,7 @@ const char* colorToString(Color color, Language language) {
             case Color::GREY: return "cinza";
             case Color::YELLOW: return "amarelo";
             case Color::BLUE: return "azul";
+            case Color::CYAN: return "ciano";
             case Color::ORANGE: return "laranja";
             case Color::PINK: return "rosa";
             case Color::PURPLE: return "roxo";
@@ -23,6 +24,7 @@ const char* colorToString(Color color, Language language) {
             case Color::GREY: return "grey";
             case Color::YELLOW: return "yellow";
             case Color::BLUE: return "blue";
+            case Color::CYAN: return "cyan";
             case Color::ORANGE: return "orange";
             case Color::PINK: return "pink";
             case Color::PURPLE: return "purple";
