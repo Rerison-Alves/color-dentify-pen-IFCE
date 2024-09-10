@@ -4,6 +4,9 @@
 const char* colorToString(Color color, Language language) {
     if (language == Language::PORTUGUESE) {
         switch (color) {
+            case Color::BLACK: return "preto";
+            case Color::WHITE: return "branco";
+            case Color::GREY: return "cinza";
             case Color::YELLOW: return "amarelo";
             case Color::BLUE: return "azul";
             case Color::ORANGE: return "laranja";
@@ -15,6 +18,9 @@ const char* colorToString(Color color, Language language) {
         }
     } else if (language == Language::ENGLISH) {
         switch (color) {
+            case Color::BLACK: return "black";
+            case Color::WHITE: return "white";
+            case Color::GREY: return "grey";
             case Color::YELLOW: return "yellow";
             case Color::BLUE: return "blue";
             case Color::ORANGE: return "orange";
