@@ -27,14 +27,25 @@ OledDisplay oled(SCREEN_WIDTH, SCREEN_HEIGHT, SDA_PIN, SCK_PIN);
 const char* WIFI_SSID = "S20";
 const char* WIFI_PASSWORD = "kust8362";
 const unsigned long BOT_MTBS = 1000;
-#define BOTtoken "7528571819:AAHvQSn3wAFr7nv_YvQMbes745q_RdBX_1o"
+#define BOTtoken "7413577911:AAGfqrVmK7rowG6zBm0oddPdxTZmHwMx7w0"
 
 Bot bot(WIFI_SSID,WIFI_PASSWORD,BOTtoken,BOT_MTBS);
+TaskHandle_t TaskBot;
 
 
 void playColorSoundTask(Color detectedColor) {
     speaker.playColorSound(detectedColor);// Reproduz o som da cor detectada
     vTaskDelete(NULL);  // Deleta a task após execução
+}
+
+void taskBot(void * pvParameters)
+{
+    while (true)
+    {
+        bot.waitMessage(nullptr);
+        delay(10);
+    }
+    
 }
 
 void setup() {
@@ -58,12 +69,20 @@ void setup() {
     //oled.begin();
 
     bot.setup();
+    xTaskCreatePinnedToCore(
+                    taskBot,   /* Task function. */
+                    "TaskBot",     /* name of task. */
+                    10000,       /* Stack size of task */
+                    NULL,        /* parameter of the task */
+                    1,           /* priority of the task */
+                    &TaskBot,      /* Task handle to keep track of created task */
+                    1);          /* pin task to core 1 */
 }
 
 void loop() {
-    //Color colorread = sensor.reading();
-    //oled.displayText(colorToString(colorread,lang));
-    //speaker.playColorSound(colorread);
-    bot.waitMessage(nullptr);
+    Color colorread = sensor.reading();
+    oled.displayText(colorToString(colorread,lang));
+    speaker.playColorSound(colorread);
+    bot.set_color(colorToString(colorread,lang),lang);
     delay(500);
 }
