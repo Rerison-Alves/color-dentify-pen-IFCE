@@ -9,9 +9,11 @@
 #define S2 18
 #define S3 19
 #define OUT 23
-#define DAC_PIN 25
 
 Sensor sensor(S0, S1, S2, S3, OUT);
+
+#define DAC_PIN 25
+
 Speaker speaker(DAC_PIN, 2.0, 15); // DacPin, TimbreFactor, VolumeFactor
 Language lang(Language::PORTUGUESE);
 
@@ -31,12 +33,6 @@ const unsigned long BOT_MTBS = 1000;
 
 Bot bot(WIFI_SSID,WIFI_PASSWORD,BOTtoken,BOT_MTBS);
 TaskHandle_t TaskBot;
-
-
-void playColorSoundTask(Color detectedColor) {
-    speaker.playColorSound(detectedColor);// Reproduz o som da cor detectada
-    vTaskDelete(NULL);  // Deleta a task após execução
-}
 
 void taskBot(void * pvParameters)
 {
@@ -62,11 +58,10 @@ void setup() {
     digitalWrite(S0,HIGH);
     digitalWrite(S1,LOW);
 
+    speaker.begin();
+    speaker.setLanguage(lang);
 
-    //speaker.begin();
-    //speaker.setLanguage(lang);
-
-    //oled.begin();
+    oled.begin();
 
     bot.setup();
     xTaskCreatePinnedToCore(

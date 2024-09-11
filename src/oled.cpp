@@ -16,9 +16,9 @@ void OledDisplay::begin() {
 
 void OledDisplay::displayText(const char* text) {
     _display.clearDisplay();
-    _display.setTextSize(1);
-    _display.setTextColor(SSD1306_WHITE);
-    _display.setCursor(0, 0);
+    _display.setTextSize(2);
+    _display.setTextColor(WHITE);
+    _display.setCursor(0, 28);
     _display.print(text);
     _display.display();
 }

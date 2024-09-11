@@ -5,8 +5,12 @@
 
 // Enum de cores em inglês
 enum class Color {
+    BLACK,
+    WHITE,
+    GREY,
     YELLOW,
     BLUE,
+    CYAN,
     ORANGE,
     PINK,
     PURPLE,

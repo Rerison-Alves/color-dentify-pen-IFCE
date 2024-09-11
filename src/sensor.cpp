@@ -42,7 +42,7 @@ Color Sensor::reading() {
     // Reading the output frequency
     greenFrequency = pulseIn(OUT, LOW);
     // Remaping the value of the GREEN (G) frequency from 0 to 255
-    greenColor = map(greenFrequency, 50, 170, 255, 0);
+    greenColor = map(greenFrequency, 50, 100, 255, 0);
 
     // Printing the GREEN (G) value
     Serial.print(" G = ");
@@ -56,7 +56,7 @@ Color Sensor::reading() {
     // Reading the output frequency
     blueFrequency = pulseIn(OUT, LOW);
     // Remaping the value of the BLUE (B) frequency from 0 to 255
-    blueColor = map(blueFrequency, 50, 105, 255, 0);
+    blueColor = map(blueFrequency, 45, 95, 255, 0);
 
     // Printing the BLUE (B) value
     Serial.print(" B = ");
@@ -65,42 +65,63 @@ Color Sensor::reading() {
 
     // Checks the current detected color and prints
     // a message in the serial monitor
-    if (redColor > greenColor && redColor > blueColor) {
-        if (greenColor > blueColor) {
-            if (redColor - greenColor < 20) {
-                Serial.println(" - LARANJA detectado!");
-                return Color::ORANGE;
-            }
-            Serial.println(" - VERMELHO detectado!");
-            return Color::RED;
-        } else {
-            Serial.println(" - ROSA detectado!");
-            return Color::PINK;
-        }
-    }
-    if (greenColor > redColor && greenColor > blueColor) {
-        if (blueColor > redColor) {
-            if (greenColor - blueColor < 20) {
-                Serial.println(" - VERDE detectado!");
-                return Color::GREEN;
-            }
-            Serial.println(" - AMARELO detectado!");
-            return Color::YELLOW;
-        } else {
-            Serial.println(" - VERDE detectado!");
-            return Color::GREEN;
-        }
-    }
-    if (blueColor > redColor && blueColor > greenColor) {
-        if (redColor > greenColor) {
-            Serial.println(" - ROXO detectado!");
-            return Color::PURPLE;
-        } else {
-            Serial.println(" - AZUL detectado!");
-            return Color::BLUE;
-        }
+
+    if (redColor < 80 && greenColor < 80 && blueColor < 80) {
+        Serial.println(" - PRETO detectado!");
+        return Color::BLACK;
     }
 
-    Serial.println("Nenhuma cor foi detectada!");
-    return Color::INVALID;
+    if (redColor > 380 && greenColor > 380 && blueColor > 380) {
+        Serial.println(" - BRANCO detectado!");
+        return Color::WHITE;
+    }
+
+    if (abs(redColor - greenColor) < DIFF_THRESHOLD && abs(redColor - blueColor) < DIFF_THRESHOLD && abs(greenColor - blueColor) < DIFF_THRESHOLD) {
+        Serial.println(" - CINZA detectado!");
+        return Color::GREY;
+    }
+
+    if (redColor > greenColor && redColor > blueColor) {
+        // Red is the predominant color
+        if (abs(greenColor - redColor) < DIFF_THRESHOLD) {
+            Serial.println(" - YELLOW detected!");
+            return Color::YELLOW;
+        } else if (abs(greenColor - redColor) < DIFF_THRESHOLD*2) {
+            Serial.println(" - ORANGE detected!");
+            return Color::ORANGE;
+        }else if (abs(blueColor - redColor) < DIFF_THRESHOLD*2) {
+            Serial.println(" - PINK detected!");
+            return Color::PINK;
+        } else {
+            Serial.println(" - RED detected!");
+            return Color::RED;
+        }
+    } else if (blueColor > redColor && blueColor > greenColor) {
+        // Blue is the predominant color
+        if (abs(blueColor - greenColor) < DIFF_THRESHOLD) {
+            Serial.println(" - CYAN detected!");
+            return Color::CYAN;
+        } else if (abs(blueColor - redColor) < DIFF_THRESHOLD*2.5) {
+            Serial.println(" - PURPLE detected!");
+            return Color::PURPLE;
+        }else {
+            Serial.println(" - BLUE detected!");
+            return Color::BLUE;
+        }
+    } else if (greenColor > redColor && greenColor > blueColor) {
+        // Green is the predominant color
+        if (abs(redColor - greenColor) < DIFF_THRESHOLD) {
+            Serial.println(" - YELLOW detected!");
+            return Color::YELLOW;
+        } else if (abs(blueColor - greenColor) < DIFF_THRESHOLD*0.6) {
+            Serial.println(" - CYAN detected!");
+            return Color::CYAN;
+        }else {
+            Serial.println(" - GREEN detected!");
+            return Color::GREEN;
+        }
+    } else {
+        Serial.println(" - INVALID COLOR detected!");
+        return Color::INVALID;
+    }
 }
