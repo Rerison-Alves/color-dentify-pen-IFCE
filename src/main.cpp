@@ -2,6 +2,7 @@
 #include "speaker.h"
 #include "sensor.h"
 #include "oled.h"
+#include "bot.h"
 
 #define S0 4
 #define S1 5
@@ -24,6 +25,25 @@ Language lang(Language::PORTUGUESE);
 
 OledDisplay oled(SCREEN_WIDTH, SCREEN_HEIGHT, SDA_PIN, SCK_PIN);
 
+//Definindo o bot
+const char* WIFI_SSID = "S20";
+const char* WIFI_PASSWORD = "kust8362";
+const unsigned long BOT_MTBS = 1000;
+#define BOTtoken "7413577911:AAGfqrVmK7rowG6zBm0oddPdxTZmHwMx7w0"
+
+Bot bot(WIFI_SSID,WIFI_PASSWORD,BOTtoken,BOT_MTBS);
+TaskHandle_t TaskBot;
+
+void taskBot(void * pvParameters)
+{
+    while (true)
+    {
+        bot.waitMessage(nullptr);
+        delay(10);
+    }
+    
+}
+
 void setup() {
   // Begins serial communication
     Serial.begin(115200);
@@ -42,11 +62,22 @@ void setup() {
     speaker.setLanguage(lang);
 
     oled.begin();
+
+    bot.setup();
+    xTaskCreatePinnedToCore(
+                    taskBot,   /* Task function. */
+                    "TaskBot",     /* name of task. */
+                    10000,       /* Stack size of task */
+                    NULL,        /* parameter of the task */
+                    1,           /* priority of the task */
+                    &TaskBot,      /* Task handle to keep track of created task */
+                    1);          /* pin task to core 1 */
 }
 
 void loop() {
     Color colorread = sensor.reading();
     oled.displayText(colorToString(colorread,lang));
     speaker.playColorSound(colorread);
+    bot.set_color(colorToString(colorread,lang),lang);
     delay(500);
 }
