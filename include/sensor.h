@@ -12,6 +12,7 @@ private:
     int redColor, greenColor, blueColor;
     int redFrequency, greenFrequency, blueFrequency;
     int S0, S1, S2, S3, OUT;
+    const int DIFF_THRESHOLD = 50;
 };
 
 #endif
