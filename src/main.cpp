@@ -74,5 +74,5 @@ void loop() {
     speaker.playColorSound(colorread);
     bot.set_color(colorToString(colorread,lang),lang);
     bot.game();
-    delay(250);
+    delay(200);
 }

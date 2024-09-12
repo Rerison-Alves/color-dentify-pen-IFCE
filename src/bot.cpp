@@ -57,8 +57,8 @@ void Bot::waitMessage(void * pvParameters)
             int randomColor = rand() % 11;
             Color color = static_cast<Color>(randomColor);
             _expected_color=colorToString(color,_lang);
-            _bot.sendMessage(_bot.messages[_numNewMessages].chat_id, "Que os jogos começem!!! \ 
-            Antes de comerçarmos a brincadeira preciso te dá uma dica:");
+            _bot.sendMessage(_bot.messages[_numNewMessages].chat_id, "Em que cor to pensando? \ 
+            dica da cor:");
             const char* hint = getColorHint(_expected_color,_lang);
             if (hint) {
                 _bot.sendMessage(_bot.messages[_numNewMessages].chat_id, hint);
