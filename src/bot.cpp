@@ -83,6 +83,7 @@ void Bot::game()
             _expected_color = nullptr;
             _novaMenssagem = true;
         }
+        delay(2000);
     }
     
   
