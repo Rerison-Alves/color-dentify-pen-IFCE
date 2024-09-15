@@ -80,18 +80,18 @@ void setup() {
 
     oled.begin();
 
-    //bot.setup();
+    bot.setup();
 
     attachInterrupt(digitalPinToInterrupt(BUTTON), handleButtonPress, FALLING);
 }
 
 void loop() {
-    //bot.waitMessage(nullptr);
+    bot.waitMessage(nullptr);
     Color colorread = sensor.reading();
     oled.displayText(colorToString(colorread,lang));
     speaker.playColorSound(colorread);
-    //bot.set_color(colorToString(colorread,lang),lang);
-    //bot.game();
+    bot.set_color(colorToString(colorread,lang),lang);
+    bot.game();
     if (buttonPressed) {
         toggleLanguage();
         buttonPressed = false;
