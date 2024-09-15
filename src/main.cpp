@@ -4,6 +4,12 @@
 #include "oled.h"
 #include "bot.h"
 
+//Definindo o botao
+#define BUTTON 14
+
+volatile bool buttonPressed = false;
+
+//Definindo o sensor
 #define S0 4
 #define S1 5
 #define S2 18
@@ -12,12 +18,13 @@
 
 Sensor sensor(S0, S1, S2, S3, OUT);
 
+//Definindo o speaker
 #define DAC_PIN 25
 
 Speaker speaker(DAC_PIN, 2.0, 15); // DacPin, TimbreFactor, VolumeFactor
 Language lang(Language::PORTUGUESE);
 
-//Definindo tela oled
+//Definindo a tela oled
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define SDA_PIN 21
@@ -32,21 +39,31 @@ const unsigned long BOT_MTBS = 1000;
 #define BOTtoken "7413577911:AAGfqrVmK7rowG6zBm0oddPdxTZmHwMx7w0"
 
 Bot bot(WIFI_SSID,WIFI_PASSWORD,BOTtoken,BOT_MTBS);
-TaskHandle_t TaskBot;
 
-void taskBot(void * pvParameters)
-{
-    while (true)
-    {
-        //bot.waitMessage(nullptr);
-        delay(100);
+void toggleLanguage() {
+    if (lang == Language::PORTUGUESE) {
+        lang = Language::ENGLISH;
+        Serial.println("Language changed to English");
+        oled.displayText("Lang: \nEnglish");
+    } else {
+        lang = Language::PORTUGUESE;
+        Serial.println("Idioma alterado para Português");
+        oled.displayText("Lang: \nPortuguese");
     }
-    
+    speaker.setLanguage(lang);
+    delay(3000);
+}
+
+void IRAM_ATTR handleButtonPress() {
+    // Define que o botão foi pressionado, controlando com debounce
+    buttonPressed = true;
 }
 
 void setup() {
   // Begins serial communication
     Serial.begin(115200);
+
+    pinMode(BUTTON, INPUT);
   
     pinMode(S0, OUTPUT);
     pinMode(S1, OUTPUT);
@@ -63,16 +80,21 @@ void setup() {
 
     oled.begin();
 
-    bot.setup();
-    //xTaskCreatePinnedToCore(taskBot,   /* Task function. */"TaskBot",     /* name of task. */10000,       /* Stack size of task */NULL,        /* parameter of the task */1,           /* priority of the task */&TaskBot,      /* Task handle to keep track of created task */1);          /* pin task to core 1 */
+    //bot.setup();
+
+    attachInterrupt(digitalPinToInterrupt(BUTTON), handleButtonPress, FALLING);
 }
 
 void loop() {
-    bot.waitMessage(nullptr);
+    //bot.waitMessage(nullptr);
     Color colorread = sensor.reading();
     oled.displayText(colorToString(colorread,lang));
     speaker.playColorSound(colorread);
-    bot.set_color(colorToString(colorread,lang),lang);
-    bot.game();
+    //bot.set_color(colorToString(colorread,lang),lang);
+    //bot.game();
+    if (buttonPressed) {
+        toggleLanguage();
+        buttonPressed = false;
+    }
     delay(250);
 }

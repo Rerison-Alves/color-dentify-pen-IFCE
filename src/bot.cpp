@@ -90,8 +90,6 @@ void Bot::game()
 }
 
 boolean Bot::colorGame() {
-    
-
     if (_color_read && strcmp(_color_read, _expected_color) == 0) {
         const char* congratilations = getCongratulationsMessage(_lang);
         _bot.sendMessage(_bot.messages[_numNewMessages].chat_id, congratilations);
