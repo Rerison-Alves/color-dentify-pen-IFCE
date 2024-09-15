@@ -1,9 +1,12 @@
 #include <Arduino.h>
 #include <String.h>
+#include <cstdlib>
+#include <ctime>
 #include "bot.h"
 
 Bot::Bot(const char* wifi_ssid, const char* wifi_password, const char* botoken, const unsigned long bot_mtbs): 
-        _wifi_ssid(wifi_ssid), _wifi_password(wifi_password), _botoken(botoken), _bot_lasttime(), _bot_mtbs(bot_mtbs), _color_read(nullptr), 
+        _wifi_ssid(wifi_ssid), _wifi_password(wifi_password), _botoken(botoken), _bot_lasttime(), _bot_mtbs(bot_mtbs), _color_read(nullptr),
+        _expected_color(nullptr), _numNewMessages(),_novaMenssagem(true),_roll(1),
         _lang(), _secured_client(), _bot(_botoken, _secured_client) {}
 
 
@@ -30,6 +33,7 @@ void Bot::setup()
         now = time(nullptr);
     }
     Serial.println(now);
+    srand(time(0));
 
 }
 
@@ -41,198 +45,59 @@ void Bot::set_color(const char* color, Language lang)
 
 void Bot::waitMessage(void * pvParameters)
 {
-    if (millis() - _bot_lasttime > _bot_mtbs)
+    if ((millis() - _bot_lasttime > _bot_mtbs)&&_novaMenssagem)
     {
-        int numNewMessages = _bot.getUpdates(_bot.last_message_received + 1);
+        int numNewMessages = _bot.getUpdates(_bot.last_message_received+1);
 
-        Serial.println("got response");
-        handleNewMessages(numNewMessages);
         
+        if(_bot.messages[numNewMessages].text=="play"||_bot.messages[numNewMessages].text=="Play"){
+            Serial.println("got response play");
+            _novaMenssagem = false;
+            _numNewMessages = numNewMessages; 
+            int randomColor = rand() % 11;
+            Color color = static_cast<Color>(randomColor);
+            _expected_color=colorToString(color,_lang);
+            _bot.sendMessage(_bot.messages[_numNewMessages].chat_id, "Em que cor to pensando? \ 
+            dica da cor:");
+            const char* hint = getColorHint(_expected_color,_lang);
+            if (hint) {
+                _bot.sendMessage(_bot.messages[_numNewMessages].chat_id, hint);
+            }
+            _roll = _roll+1;
+        }else if(_bot.messages[numNewMessages].text=="over"||_bot.messages[numNewMessages].text=="Over"){
+            Serial.println("got response over");
+            _numNewMessages = numNewMessages;
+            _expected_color=nullptr;
+            
+        }
         
-
         _bot_lasttime = millis();
     } 
 }
 
-void Bot::handleNewMessages(int numNewMessages)
+void Bot::game()
 {
-  
-   
-    if(_bot.messages[numNewMessages].text=="play"){
-
-        _bot.sendMessage(_bot.messages[numNewMessages].chat_id, "Que os jogos começem!!! \ 
-        Antes de comerçarmos a brincadeira preciso te dá uma dica:");
-       
-        redGame(numNewMessages);
-        purpleGame(numNewMessages);
-        blueGame(numNewMessages);
-        if(_lang==Language::PORTUGUESE){
-            _bot.sendMessage(_bot.messages[numNewMessages].chat_id, "Meus parabens, vc conseguiu finalizar o meu jogo!!!!!");
-        }else{
-            _bot.sendMessage(_bot.messages[numNewMessages].chat_id, "You rock! You beat my game!!!!!");
+    if(_expected_color!=nullptr){
+        bool cor_certa=colorGame();
+        if(cor_certa==true || _bot.messages[_numNewMessages].text=="over"||_bot.messages[_numNewMessages].text=="Over"){
+            _expected_color = nullptr;
+            _novaMenssagem = true;
         }
-       
+        delay(2000);
     }
     
   
 }
 
-boolean Bot::vermelho(int chat_id)
-{
-    if(_color_read=="vermelho"){
-        const char *congratilations = 
-        "Parabens!!!!!! \ 
-        vc acertou a cor \ 
-        Agora vamos para a proxima cor";
-        _bot.sendMessage(_bot.messages[chat_id].chat_id, congratilations);
-        _color_read = nullptr;
-        return false;
-    }
-    return true;
-}
-boolean Bot::red(int chat_id)
-{
-    if(_color_read=="red"){
-        const char *congratilations = 
-        "Parabens!!!!!! \ 
-        vc acertou a cor \ 
-        Agora vamos para a proxima cor";
-        _bot.sendMessage(_bot.messages[chat_id].chat_id, congratilations);
-        _color_read = nullptr;
-        return false;
-    }
-    return true;
-}
-
-boolean Bot::roxo(int chat_id)
-{
-    if(_color_read=="roxo"){
-        const char *congratilations = 
-        "Parabens!!!!!! \ 
-        vc acertou a cor \ 
-        Agora vamos para a proxima cor";
-        _bot.sendMessage(_bot.messages[chat_id].chat_id, congratilations);
-        _color_read = nullptr;
-        return false;
-    }
-    return true;
-}
-boolean Bot::purple(int chat_id)
-{
-    if(_color_read=="purple"){
-       const char *congratilations = 
-        "Parabens!!!!!! \ 
-        vc acertou a cor \ 
-        Agora vamos para a proxima cor";
-        _bot.sendMessage(_bot.messages[chat_id].chat_id, congratilations);
-        _color_read = nullptr;
-        return false;
-    }
-    return true;
-}
-
-boolean Bot::azul(int chat_id)
-{
-    if(_color_read=="azul"){
-       const char *congratilations = 
-        "Parabens!!!!!! \ 
-        vc acertou a cor \ 
-        Agora vamos para a proxima cor";
-        _bot.sendMessage(_bot.messages[chat_id].chat_id, congratilations);
-        _color_read = nullptr;
-        return false;
-    }
-    return true;
-}
-boolean Bot::blue(int chat_id)
-{
-    if(_color_read=="blue"){
-       const char *congratilations = 
-        "Parabens!!!!!! \ 
-        vc acertou a cor \ 
-        Agora vamos para a proxima cor";
-        _bot.sendMessage(_bot.messages[chat_id].chat_id, congratilations);
-        return false;
-    }
-    return true;
-}
-
-void Bot::redGame(int chat_id)
-{
-    bool cor_errada = true;
-    _bot.sendMessage(_bot.messages[chat_id].chat_id, "A cor que eu tenho em mente é comum em frutas e flores");
+boolean Bot::colorGame() {
     
-    while(cor_errada)
-    {
-        const char* last_color = _color_read;
+
+    if (_color_read && strcmp(_color_read, _expected_color) == 0) {
+        const char* congratilations = getCongratulationsMessage(_lang);
+        _bot.sendMessage(_bot.messages[_numNewMessages].chat_id, congratilations);
         
-        if(_lang==Language::PORTUGUESE){
-            if(_color_read==nullptr){
-                delay(10);
-                continue;
-            }
-            cor_errada=vermelho(chat_id); 
-        }else{
-            if(_color_read==nullptr){
-                delay(10);
-                continue;
-            }
-            cor_errada=red(chat_id);
-            
-        }
+        return true;
     }
-    
-}
-
-
-void Bot::purpleGame(int chat_id)
-{
-    bool cor_errada = true;
-    _bot.sendMessage(_bot.messages[chat_id].chat_id, "A cor que eu tenho em mente é muito bonita mas raramente encontrada na naturaza");
-
-    while(cor_errada) 
-    {
-        const char* last_color = _color_read;
-        if(_lang==Language::PORTUGUESE){
-            if(_color_read==nullptr){
-                delay(10);
-                continue;
-            }
-            cor_errada=roxo(chat_id);
-            
-        }else{
-            if(_color_read==nullptr){
-                delay(10);
-                continue;
-            }
-            cor_errada=purple(chat_id);
-            
-        }
-    }
-
-}
-
-void Bot::blueGame(int chat_id)
-{
-    bool cor_errada = true;
-    _bot.sendMessage(_bot.messages[chat_id].chat_id, "A cor que eu tenho em mente está no lemento base da vida.");
-    while(cor_errada)
-    {
-        const char* last_color = _color_read;
-        if(_lang==Language::PORTUGUESE){
-            if(_color_read==nullptr){
-                delay(10);
-                continue;
-            }
-            cor_errada=azul(chat_id);
-        }else{
-            if(_color_read==nullptr){
-                delay(10);
-                continue;
-            }
-            cor_errada=blue(chat_id);
-        }
-    }
-
+    return false;  
 }
 

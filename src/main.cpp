@@ -38,8 +38,8 @@ void taskBot(void * pvParameters)
 {
     while (true)
     {
-        bot.waitMessage(nullptr);
-        delay(10);
+        //bot.waitMessage(nullptr);
+        delay(100);
     }
     
 }
@@ -64,20 +64,15 @@ void setup() {
     oled.begin();
 
     bot.setup();
-    xTaskCreatePinnedToCore(
-                    taskBot,   /* Task function. */
-                    "TaskBot",     /* name of task. */
-                    10000,       /* Stack size of task */
-                    NULL,        /* parameter of the task */
-                    1,           /* priority of the task */
-                    &TaskBot,      /* Task handle to keep track of created task */
-                    1);          /* pin task to core 1 */
+    //xTaskCreatePinnedToCore(taskBot,   /* Task function. */"TaskBot",     /* name of task. */10000,       /* Stack size of task */NULL,        /* parameter of the task */1,           /* priority of the task */&TaskBot,      /* Task handle to keep track of created task */1);          /* pin task to core 1 */
 }
 
 void loop() {
+    bot.waitMessage(nullptr);
     Color colorread = sensor.reading();
     oled.displayText(colorToString(colorread,lang));
     speaker.playColorSound(colorread);
     bot.set_color(colorToString(colorread,lang),lang);
-    delay(500);
+    bot.game();
+    delay(250);
 }
